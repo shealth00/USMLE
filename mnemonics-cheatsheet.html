@@ -1,0 +1,459 @@
+<title>Step 1 Mnemonics</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap">
+
+<style>
+/* ── Layout: sticky category rail + scrollable card grid ── */
+:root {
+  --bg:       #f7f8fa;
+  --bg2:      #ffffff;
+  --fg:       #0d1117;
+  --fg2:      #4b5563;
+  --border:   #e2e6ec;
+  --shadow:   0 1px 3px rgba(0,0,0,.07), 0 1px 1px rgba(0,0,0,.04);
+
+  --c-neuro:   #2563eb;
+  --c-hyneu:   #7c3aed;
+  --c-path:    #d97706;
+  --c-gen:     #059669;
+  --c-stat:    #db2777;
+  --c-immuno:  #dc2626;
+  --c-phys:    #0891b2;
+
+  --font-ui:   'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:     #0d1117;
+    --bg2:    #161b22;
+    --fg:     #e6edf3;
+    --fg2:    #8b949e;
+    --border: #30363d;
+    --shadow: 0 1px 3px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:     #0d1117;
+  --bg2:    #161b22;
+  --fg:     #e6edf3;
+  --fg2:    #8b949e;
+  --border: #30363d;
+  --shadow: 0 1px 3px rgba(0,0,0,.3);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--fg);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0;
+}
+
+/* ── Header ── */
+.page-header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px 0;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto;
+  height: env(safe-area-inset-top, 0px);
+  background: var(--bg2);
+  z-index: 21;
+}
+.header-top {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.header-top h1 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: var(--fg);
+}
+.header-top .count {
+  font-size: .8rem;
+  color: var(--fg2);
+  font-variant-numeric: tabular-nums;
+}
+.search-wrap {
+  margin-left: auto;
+}
+.search-wrap input {
+  font-family: var(--font-ui);
+  font-size: .85rem;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--fg);
+  width: 180px;
+  outline: none;
+  transition: border-color .15s;
+}
+.search-wrap input:focus { border-color: var(--c-neuro); }
+.search-wrap input::placeholder { color: var(--fg2); }
+
+/* ── Category filter rail ── */
+.cat-rail {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.cat-rail::-webkit-scrollbar { display: none; }
+.cat-btn {
+  flex-shrink: 0;
+  border: none;
+  border-radius: 20px;
+  padding: 5px 13px;
+  font-size: .78rem;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: opacity .12s, transform .1s;
+  background: var(--border);
+  color: var(--fg2);
+  letter-spacing: .01em;
+}
+.cat-btn:hover { opacity: .8; }
+.cat-btn.active { color: #fff; }
+.cat-btn[data-cat="all"].active  { background: var(--fg); }
+.cat-btn[data-cat="neuro"].active  { background: var(--c-neuro); }
+.cat-btn[data-cat="hyneu"].active  { background: var(--c-hyneu); }
+.cat-btn[data-cat="path"].active   { background: var(--c-path); }
+.cat-btn[data-cat="gen"].active    { background: var(--c-gen); }
+.cat-btn[data-cat="stat"].active   { background: var(--c-stat); }
+.cat-btn[data-cat="immuno"].active { background: var(--c-immuno); }
+.cat-btn[data-cat="phys"].active   { background: var(--c-phys); }
+
+/* ── Main grid ── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 12px;
+  padding: 16px 0 32px;
+}
+
+/* ── Mnemonic card ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: transform .12s, box-shadow .12s;
+}
+.card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,.1);
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px 8px;
+}
+.card-emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 36px;
+  text-align: center;
+}
+.card-scene {
+  font-size: .82rem;
+  font-weight: 600;
+  color: var(--fg);
+  flex: 1;
+  min-width: 0;
+  line-height: 1.3;
+}
+.cat-tag {
+  flex-shrink: 0;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 4px;
+  color: #fff;
+}
+.cat-tag.neuro  { background: var(--c-neuro); }
+.cat-tag.hyneu  { background: var(--c-hyneu); }
+.cat-tag.path   { background: var(--c-path); }
+.cat-tag.gen    { background: var(--c-gen); }
+.cat-tag.stat   { background: var(--c-stat); }
+.cat-tag.immuno { background: var(--c-immuno); }
+.cat-tag.phys   { background: var(--c-phys); }
+
+.card-mnemonic {
+  margin: 0 12px 12px;
+  padding: 9px 11px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: .78rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--fg);
+  border-left: 3px solid currentColor;
+  flex: 1;
+}
+.card-mnemonic.neuro  { background: color-mix(in srgb, var(--c-neuro) 8%, var(--bg2)); border-color: var(--c-neuro); }
+.card-mnemonic.hyneu  { background: color-mix(in srgb, var(--c-hyneu) 8%, var(--bg2)); border-color: var(--c-hyneu); }
+.card-mnemonic.path   { background: color-mix(in srgb, var(--c-path) 8%, var(--bg2));  border-color: var(--c-path); }
+.card-mnemonic.gen    { background: color-mix(in srgb, var(--c-gen) 8%, var(--bg2));   border-color: var(--c-gen); }
+.card-mnemonic.stat   { background: color-mix(in srgb, var(--c-stat) 8%, var(--bg2));  border-color: var(--c-stat); }
+.card-mnemonic.immuno { background: color-mix(in srgb, var(--c-immuno) 8%, var(--bg2));border-color: var(--c-immuno); }
+.card-mnemonic.phys   { background: color-mix(in srgb, var(--c-phys) 8%, var(--bg2));  border-color: var(--c-phys); }
+
+.card-q {
+  padding: 0 14px 11px;
+  font-size: .74rem;
+  color: var(--fg2);
+  line-height: 1.45;
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+  padding-top: 9px;
+}
+.card.hidden { display: none; }
+
+.no-results {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 0;
+  color: var(--fg2);
+  font-size: .9rem;
+}
+</style>
+
+<div class="page-header">
+  <div class="header-top">
+    <h1>⚡ Step 1 Mnemonics</h1>
+    <span class="count" id="visCount">36 of 36</span>
+    <div class="search-wrap">
+      <input type="search" id="searchInput" placeholder="Search mnemonics…" autocomplete="off">
+    </div>
+  </div>
+  <div class="cat-rail" role="tablist">
+    <button class="cat-btn active" data-cat="all">All 36</button>
+    <button class="cat-btn" data-cat="neuro">Neuroanatomy</button>
+    <button class="cat-btn" data-cat="hyneu">HY Neurology</button>
+    <button class="cat-btn" data-cat="path">Pathology</button>
+    <button class="cat-btn" data-cat="gen">Genetics</button>
+    <button class="cat-btn" data-cat="stat">Biostats &amp; Psych</button>
+    <button class="cat-btn" data-cat="immuno">Immunology</button>
+    <button class="cat-btn" data-cat="phys">Phys / Histo</button>
+  </div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<script>
+const DATA = [
+  {cat:'neuro', emoji:'🎯', scene:'The CROSSING Wizard',
+   mnem:'D-C-M: Dorsal Crosses at Medulla; Spinothal Crosses 1-2 up',
+   q:'Right-sided vibration/proprioception loss + Left-sided pain/temp loss → contralateral sensory dissociation'},
+  {cat:'neuro', emoji:'👁️', scene:'The Blown Pupil',
+   mnem:'CN III = Big Drunk Eye: down-and-out + blown pupil',
+   q:'Sudden headache + dilated unreactive pupil with eye "down and out" → CN III compression (PComm aneurysm)'},
+  {cat:'neuro', emoji:'😤', scene:'The Crying Eye + Droopy Lid',
+   mnem:'SMITH: Sympathetic lesion → ptosis, Miosis, anhydrosis = Horner',
+   q:'Ptosis + miosis + anhydrosis (no ipsilateral sweating) = Horner syndrome'},
+  {cat:'neuro', emoji:'🍷', scene:'The Waiter',
+   mnem:"ERB = C5-C6 = Waiter's tip position (arm adducted, medially rotated, elbow extended)",
+   q:'Shoulder dystocia → arm adducted, medially rotated, elbow extended = Erb palsy'},
+  {cat:'neuro', emoji:'🤜', scene:'The Claw',
+   mnem:'KLUMPKE = C8-T1 = ulnar claw hand',
+   q:'Midshaft humerus fracture → wrist drop = radial nerve; C8-T1 claw = Klumpke'},
+  {cat:'neuro', emoji:'🕳️', scene:'The Blind Tunnel',
+   mnem:'Optic chiasm lesion = bitemporal hemianopia = think pituitary tumor!',
+   q:'Bitemporal hemianopia starting in superior fields = pituitary adenoma compressing optic chiasm'},
+  {cat:'hyneu', emoji:'🔥', scene:'The PICA-chew Monster',
+   mnem:'PICA = PIKAchu = dysphagia/dysarthria + crossed signs (ipsilat face, contralat body)',
+   q:'Ipsilateral facial numbness + Horner + dysphagia + contralateral limb sensory loss = lateral medullary (Wallenberg) syndrome'},
+  {cat:'hyneu', emoji:'🎓', scene:'The Word Salad Chef',
+   mnem:"Wernicke = fluent WORD SALAD = temporal lobe = can't comprehend",
+   q:"Fluent speech with jargon/neologisms + can't understand commands = Wernicke aphasia (dominant superior temporal)"},
+  {cat:'hyneu', emoji:'📊', scene:'The Spinal Tap Lab',
+   mnem:'CSF: Bacterial = Neutrophils + LOW glucose; Fungal = HIGH opening pressure + India ink',
+   q:'CSF: high opening pressure, lymphocytes, LOW glucose, India ink positive = Cryptococcus'},
+  {cat:'hyneu', emoji:'💪', scene:'The Sagging Lids Contest',
+   mnem:'MG = AChR post-synaptic (worse with use); LE = VGCC pre-synaptic (better with use)',
+   q:'Proximal muscle weakness that IMPROVES with repetition + associated with small cell lung cancer = Lambert-Eaton'},
+  {cat:'hyneu', emoji:'⚡', scene:'The Ascending Lightning',
+   mnem:'GBS: Ascending paralysis + Albumino-cytologic dissociation in CSF',
+   q:'GBS CSF: high protein, normal WBC = albuminocytologic dissociation'},
+  {cat:'hyneu', emoji:'🌊', scene:'The Dizzy Crystal',
+   mnem:'BPPV: Dix-Hallpike Dx → Epley Tx = roll the crystal out',
+   q:'Brief vertigo when rolling in bed, < 1 min, Dix-Hallpike positive = BPPV (posterior semicircular canal)'},
+  {cat:'hyneu', emoji:'😴', scene:'The Narcolepsy Laugher',
+   mnem:'Narcolepsy = No Orexin = fall asleep laughing (cataplexy)',
+   q:'Sudden muscle weakness triggered by laughter (cataplexy) + daytime sleepiness = Narcolepsy, tx: sodium oxybate'},
+  {cat:'hyneu', emoji:'🏥', scene:'The Brain Tumor Gallery',
+   mnem:'Kids: Pilocytic + Medulloblastoma + Craniopharyngioma; Adults: GBM + Metastases',
+   q:'10yo cerebellar cystic mass with Rosenthal fibers + cyst + nodule = Pilocytic astrocytoma'},
+  {cat:'hyneu', emoji:'😣', scene:'The Headache Toolbox',
+   mnem:'Cluster: O₂ + Verapamil (prophylaxis) | Migraine: triptan (abortive) + Propranolol (prophylaxis)',
+   q:'45-min severe unilateral headache + ipsilateral lacrimation/rhinorrhea, once daily = Cluster headache'},
+  {cat:'hyneu', emoji:'🧊', scene:'The Dopamine Blockade Battle',
+   mnem:'Acute dystonia = Benzo; NMS = Dantrolene; Akathisia = Propranolol; Tardive dyskinesia = Switch drug',
+   q:'Haloperidol → sustained neck muscle spasm (torticollis) = Acute dystonia → treat with diphenhydramine/benzo'},
+  {cat:'hyneu', emoji:'🌀', scene:'The MS Highway',
+   mnem:'MS: T cells vs oligodendrocytes; MLF lesion = INO = cannot adduct ipsilateral eye',
+   q:'Young woman with optic neuritis then internuclear ophthalmoplegia (cannot adduct) = MS'},
+  {cat:'hyneu', emoji:'🚨', scene:'The Stroke Map',
+   mnem:'MCA = face + arm; ACA = leg; PCA = vision; PICA = crossed signs',
+   q:'Contralateral leg weakness + urinary incontinence, face spared = ACA territory stroke'},
+  {cat:'path', emoji:'📉', scene:'The Shock Calculator',
+   mnem:'Septic: HOT CO, LOW SVR | Cardiogenic: LOW CO, HIGH PCWP, HIGH SVR',
+   q:'Septic shock: ↑CO, ↑HR, ↓SVR, warm extremities, wide pulse pressure'},
+  {cat:'path', emoji:'🫁', scene:'The Lung Spirometer',
+   mnem:'Obstructive: ↓FEV₁/FVC ratio (<0.7) | Restrictive: ↓FVC, normal or ↑ratio',
+   q:'Smoker FEV₁/FVC = 0.55, FEV₁ 40% predicted, no bronchodilator response = COPD (obstructive)'},
+  {cat:'path', emoji:'🫘', scene:'The Kidney Tube Map',
+   mnem:'PCT: AA/glucose/Na/water | Thick LOH: Na-K-2Cl (furosemide) | DCT: Na-Cl (thiazide)',
+   q:'Diuretic at thick ascending limb blocking Na-K-2Cl = Loop diuretic (furosemide)'},
+  {cat:'path', emoji:'🔬', scene:'The Cell Injury Lab',
+   mnem:'Reversible: cell swelling | Irreversible: nuclear pyknosis → karyorrhexis → karyolysis',
+   q:'Ischemic cell with hypereosinophilia + pyknosis = irreversible injury (early coagulative necrosis)'},
+  {cat:'gen', emoji:'😊', scene:'The Happy vs Fat Baby',
+   mnem:"PW = Paternal deletion = Plump/Whiney; AS = Absent maternal = Always Smiling",
+   q:'Hypotonia + obesity + hypogonadism + intellectual disability = Prader-Willi (paternal 15q11 deletion)'},
+  {cat:'gen', emoji:'🔢', scene:'The Trisomy Trio',
+   mnem:'Trisomy 13 = cleft + holoprosencephaly (BAD); 18 = rocker-bottom + clenched fist; 21 = Down',
+   q:'Rocker-bottom feet + overlapping fingers + micrognathia = Trisomy 18 (Edwards)'},
+  {cat:'gen', emoji:'👩', scene:'The Turner Tower',
+   mnem:'Turner: 45,X → Cystic hygroma (neonatal), Webbed neck, Short, Shield chest, No periods',
+   q:'16yo with primary amenorrhea + short stature + webbed neck + bicuspid aortic valve = Turner (45,X)'},
+  {cat:'gen', emoji:'🧬', scene:'The Autosomal Toolbox',
+   mnem:'AD: gain-of-function, 50% chance | AR: both parents carriers → 25% affected',
+   q:'Both parents carriers of AR disease → 25% affected, 50% carrier, 25% normal'},
+  {cat:'stat', emoji:'🔍', scene:'The Test Result Machine',
+   mnem:"SnNOut: High Sensitivity → Negative rules OUT | SpPIn: High Specificity → Positive rules IN",
+   q:'Best characteristic for screening test (rule out disease) = HIGH SENSITIVITY'},
+  {cat:'stat', emoji:'⏱️', scene:'The Bias Trap',
+   mnem:'Lead-time bias: screen finds it earlier but survival same | Length bias: screen finds slow-growing cancers',
+   q:'New cancer screening appears to improve 5-yr survival but mortality unchanged = Lead-time bias'},
+  {cat:'stat', emoji:'🧘', scene:'The Erikson Ladder',
+   mnem:'Trust → Autonomy → Initiative → Industry → Identity → Intimacy → Generativity → Ego Integrity',
+   q:'70yo satisfied with life accomplishments = Ego Integrity vs Despair (Erikson stage 8)'},
+  {cat:'immuno', emoji:'🛡️', scene:'The Complement Army',
+   mnem:'Classic = C1q + antibody | Lectin = Mannose | Alternative = spontaneous; ALL → MAC (C5b-9)',
+   q:'Mannose residues on bacteria activate Lectin complement pathway (no antibody needed)'},
+  {cat:'immuno', emoji:'💉', scene:'The Transplant Rejection Timer',
+   mnem:'Hyperacute = Minutes (preformed Ab) | Acute = Weeks (T cells) | Chronic = Months (fibrosis)',
+   q:'Transplanted kidney fails within minutes of reperfusion = Hyperacute rejection (preformed anti-donor Ab)'},
+  {cat:'immuno', emoji:'🦠', scene:'The Immunodeficiency Gallery',
+   mnem:"Bruton's = No B cells (BTK mutation, XLA) | DiGeorge = No T cells, no thymus, 22q11",
+   q:"6-month-old boy + recurrent encapsulated bacteria + absent B cells = Bruton's XLA (BTK mutation)"},
+  {cat:'immuno', emoji:'🌿', scene:'The IgA Protector',
+   mnem:'IgA deficiency: most common PID → anaphylaxis to blood transfusion (anti-IgA antibodies!)',
+   q:'Most common primary immunodeficiency = Selective IgA deficiency'},
+  {cat:'phys', emoji:'💪', scene:'The Sarcomere Ruler',
+   mnem:'A band = myosin Always stays same length | I band + H zone shorten during contraction',
+   q:'During muscle contraction, which band does NOT change length? A band (myosin, always stays)'},
+  {cat:'phys', emoji:'❤️', scene:'The Starling Curve',
+   mnem:'↑ Preload → ↑ Stroke volume (up the curve) | Heart failure = curve shifts right + down',
+   q:'Stroke volume most directly increased by: ↑ preload (Frank-Starling law)'},
+  {cat:'phys', emoji:'🔬', scene:'The Cell Lining Gallery',
+   mnem:'Simple squamous = BVs + alveoli | Pseudostratified ciliated = respiratory | Transitional = bladder',
+   q:'Type I pneumocytes (alveoli) and endothelium share simple squamous epithelium'},
+];
+
+const grid = document.getElementById('grid');
+const searchInput = document.getElementById('searchInput');
+const visCount = document.getElementById('visCount');
+const catBtns = document.querySelectorAll('.cat-btn');
+
+let activeCat = 'all';
+let searchTerm = '';
+
+const CAT_LABELS = {
+  neuro:'Neuro', hyneu:'HY Neuro', path:'Path', gen:'Gen',
+  stat:'Stat', immuno:'Immuno', phys:'Phys'
+};
+
+// Build cards
+DATA.forEach((d, i) => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.dataset.cat = d.cat;
+  card.dataset.search = (d.scene + ' ' + d.mnem + ' ' + d.q).toLowerCase();
+  card.innerHTML = `
+    <div class="card-top">
+      <div class="card-emoji">${d.emoji}</div>
+      <div class="card-scene">${d.scene}</div>
+      <span class="cat-tag ${d.cat}">${CAT_LABELS[d.cat]}</span>
+    </div>
+    <div class="card-mnemonic ${d.cat}">${d.mnem}</div>
+    <div class="card-q">${d.q}</div>
+  `;
+  grid.appendChild(card);
+});
+
+function updateCount() {
+  const visible = grid.querySelectorAll('.card:not(.hidden)').length;
+  visCount.textContent = visible + ' of ' + DATA.length;
+}
+
+function filter() {
+  const cards = grid.querySelectorAll('.card');
+  let noResults = true;
+  cards.forEach(card => {
+    const catMatch = activeCat === 'all' || card.dataset.cat === activeCat;
+    const searchMatch = !searchTerm || card.dataset.search.includes(searchTerm);
+    const hide = !catMatch || !searchMatch;
+    card.classList.toggle('hidden', hide);
+    if (!hide) noResults = false;
+  });
+  let nr = grid.querySelector('.no-results');
+  if (noResults) {
+    if (!nr) {
+      nr = document.createElement('div');
+      nr.className = 'no-results';
+      nr.textContent = 'No mnemonics match your search.';
+      grid.appendChild(nr);
+    }
+  } else if (nr) nr.remove();
+  updateCount();
+}
+
+catBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    catBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeCat = btn.dataset.cat;
+    filter();
+  });
+});
+
+searchInput.addEventListener('input', () => {
+  searchTerm = searchInput.value.trim().toLowerCase();
+  filter();
+});
+
+updateCount();
+</script>
